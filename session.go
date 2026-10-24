@@ -3,9 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"io"
 	"net/http"
-	"net/url"
 	"strings"
 )
 
@@ -49,171 +47,7 @@ func StartSession(b *bufio.Scanner, store *Data) {
 
 			// actual api testing logic (GET only for now)
 		case "TEST":
-			val, ok := HandleTestValdiation(parts, store)
-			if !ok {
-				continue
-			}
-
-			//  utility variables
-			UtilConf := InitTestUtilConf()
-			// request dependent variables
-
-			ReqConf := InitTestReqConf()
-			// default request (GET) so cl does not stay nil if user were not to pass -X
-			ReqConf.cl, ReqConf.clErr = http.NewRequest(http.MethodGet, val, nil)
-			// clErr is handled below, after flags are parsed and appropriate requests are made.
-
-			// parse header arguments
-			for i := range parts {
-				upc := strings.ToUpper(parts[i]) // normalize "-h" to all uppercase
-
-				if upc == "-H" {
-					headerSlice, ok := HandleHeaderAppending(parts, i, upc)
-					if !ok {
-						UtilConf.pass = false
-						continue
-					}
-
-					ReqConf.reqHeaders = headerSlice // store headerSLice contents which were extracted.
-				}
-
-				// to check if argument is for req methods
-				if upc == "-X" {
-					newReqMethod, exists := HandleRequestMethodValidation(parts, i)
-					if !exists {
-						UtilConf.pass = false
-						continue
-					}
-
-					if newReqMethod == "POST" {
-						UtilConf.reqType = http.MethodPost
-
-						uppercased1, exists := HandlePostValidation(parts, i)
-						if !exists {
-							UtilConf.pass = false
-							continue
-						}
-
-						if uppercased1 == "-D" { // for normal json data
-
-							cleanedData, ok := HandleJsonDataInput(parts, i)
-							if !ok {
-								UtilConf.pass = false
-								continue
-							}
-
-							// assign jsonData to cleaned
-							UtilConf.jsonData = cleanedData
-
-						}
-
-						if uppercased1 == "-F" { // form mode
-							formParts, ok := HandleFormDataInput(parts, i)
-							if !ok {
-								UtilConf.pass = false
-								continue
-							}
-
-							// appending the form values
-							data := url.Values{}
-
-							data.Set(formParts[0], formParts[1])
-							enc := data.Encode() // encode
-
-							ReqConf.formBody = strings.NewReader(enc)
-						}
-
-					} else {
-						if newReqMethod == "GET" {
-							UtilConf.reqType = http.MethodGet
-						} else {
-							fmt.Println("invalid method type.")
-							continue
-						}
-					}
-
-				}
-
-				// small flag value to ensure headers dont overwrite eachother
-				isJsonH := false
-				isFormH := false
-
-				client := http.Client{}
-				// cl, err := http.NewRequest(reqType, val, nil) // new request
-				if UtilConf.jsonData != "" && UtilConf.reqType == http.MethodPost {
-					ReqConf.cl, ReqConf.clErr = http.NewRequest(UtilConf.reqType, val, strings.NewReader(UtilConf.jsonData))
-
-					// set content type to json after creating request
-					ReqConf.cl.Header.Add("Content-Type", "application/json")
-					isJsonH = true
-				} else {
-					if UtilConf.jsonData == "" && UtilConf.reqType == http.MethodPost { // meaning that its form related request body data
-						ReqConf.cl, ReqConf.clErr = http.NewRequest(UtilConf.reqType, val, ReqConf.formBody)
-
-						// setting appropriate header afterwards
-						ReqConf.cl.Header.Add("Content-Type", "application/x-www-form-urlencoded")
-						isFormH = true
-					}
-					if UtilConf.reqType == http.MethodGet { // standard get method
-						ReqConf.cl, ReqConf.clErr = http.NewRequest(http.MethodGet, val, nil)
-					}
-
-				}
-
-				if ReqConf.clErr != nil {
-					fmt.Println(ReqConf.clErr)
-					continue
-				}
-
-				if !UtilConf.pass {
-					continue
-				}
-
-				if !isJsonH && !isFormH {
-					if len(ReqConf.reqHeaders) == 2 {
-						ReqConf.cl.Header.Add(ReqConf.reqHeaders[0], ReqConf.reqHeaders[1])
-					}
-				}
-
-				resp, err2 := client.Do(ReqConf.cl) // send the request to the url provided
-				if err2 != nil {
-					fmt.Println(err2.Error())
-					continue
-				}
-
-				// shadow auth header from resp
-				clonedH := resp.Header.Clone()
-				clonedH.Del("authorization")
-
-				respB := resp.Body
-				defer respB.Close()
-				// outputting
-				fmt.Println("response headers:")
-				// fmt.Println(clonedH)
-				for header, val := range clonedH {
-					fmt.Println("header:", header)
-					for _, v := range val {
-						fmt.Println("value:", v)
-						for range 5 {
-							fmt.Print("-")
-						}
-					}
-				}
-				for range 10 {
-					fmt.Print("-") // seperator for headers and resp body so its easier to read
-				}
-				body, err := io.ReadAll(respB) // read respB bytes
-				if err != nil {
-					continue // skip current iteration if no body
-				} else {
-					fmt.Println("\nresponse body:")
-					for range 10 {
-						fmt.Print("-")
-					}
-					fmt.Println("\n", string(body))
-				}
-
-			}
+			RunTestCommand(parts, store)
 		case "SPAM":
 			conf := InitSpamConfig()
 
@@ -249,7 +83,6 @@ func StartSession(b *bufio.Scanner, store *Data) {
 						continue
 					}
 				}
-
 				// post req
 				if strings.ToUpper(conf.reqMethod) == "POST" {
 					ok := HandleSpamPost(remainingArgs, conf, store)
