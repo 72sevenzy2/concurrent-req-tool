@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -19,8 +18,8 @@ func (h *HeaderFlags) Set(value string) error {
 
 func Validate(args []string) error {
 	if len(args) < 1 {
-		UsageMsg := errors.New("usage > main.go <URL> [-H key:value]")
-		return fmt.Errorf("%s", UsageMsg.Error())
+		UsageMsg := InvalidInputErr
+		return UsageMsg
 	}
 	return nil
 }
@@ -33,7 +32,7 @@ func AddHeaders(req *http.Request, args HeaderFlags) error {
 	for _, h := range args {
 		parts := strings.SplitN(h, ":", 2)
 		if len(parts) != 2 {
-			return fmt.Errorf("invalid input type %s", h)
+			return InvalidInputErr
 		}
 
 		// appending headers

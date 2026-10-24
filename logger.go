@@ -67,7 +67,7 @@ type LoggerParamConf struct {
 func Log(conf *LoggerParamConf) *LoggerConf { // move time.Now() (start) and end to inside gorountines.
 	resultChan := make(chan *RequestResult, *conf.ReqNo)
 	// ^ channels for number of workers per request
-	for  range *conf.ReqNo {
+	for range *conf.ReqNo {
 		go func(conf *LoggerParamConf, result chan<- *RequestResult) {
 			start := time.Now()
 			resp, resperr := conf.Reqclient.Do(conf.Req)
@@ -75,7 +75,7 @@ func Log(conf *LoggerParamConf) *LoggerConf { // move time.Now() (start) and end
 				result <- &RequestResult{
 					Reqerr: resperr,
 				}
-				return // exit if err (other will panic when touching resp.Body)
+				return
 			}
 			end := time.Since(start)
 

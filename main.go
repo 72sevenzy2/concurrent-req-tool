@@ -33,7 +33,7 @@ func main() {
 
 	flag.Parse() // parse flags
 
-	// before validating flag.Args for other features, check is session is set first.
+	// before validating flag.Args for other features, check if session mode is set first.
 	if *session {
 		scanner := bufio.NewScanner(os.Stdin)
 		store := NewStore()
@@ -51,7 +51,6 @@ func main() {
 	uc := strings.ToUpper(*method) // normalise request method input as all caps for easier comparison
 	var v string                   // holding actual method after validating if method is appropriate
 
-	// simplified
 	allowed := map[string]bool{
 		"GET":  true,
 		"POST": true,
@@ -60,7 +59,7 @@ func main() {
 	if allowed[uc] {
 		v = uc
 	} else {
-		fmt.Println("method not allowed")
+		fmt.Println(InvalidMethodErr.Error())
 		return
 	}
 
@@ -68,12 +67,15 @@ func main() {
 	var body io.Reader
 
 	if *data != "" {
+		if v == http.MethodGet {
+			fmt.Println(bodyNotAllowederr.Error())
+			return
+		}
+
 		body = strings.NewReader(*data)
 	}
 
 	req, err := http.NewRequest(v, url, body)
-
-	// req, err := http.NewRequest("GET", url, nil) // initialising an http request
 	if err != nil {
 		log.Fatal(err.Error())
 		return
@@ -86,11 +88,8 @@ func main() {
 	}
 
 	client := &http.Client{
-		Timeout: 10 * time.Second, // timeout so that request doesnt last forever
-	} // initialising the client
-
-	// debugging
-	fmt.Println("bodyAllowed:", *allowedBody)
+		Timeout: 10 * time.Second, // safeguards against hung network calls.
+	}
 
 	// logger parameters config
 	LogParamConf := &LoggerParamConf{
@@ -109,7 +108,7 @@ func main() {
 			fmt.Println("body is empty")
 		}
 
-		if result.Reqerr != nil { // LoggingConf.Reqerr is a []error.
+		if result.Reqerr != nil {
 			LoggingConf.Err()
 			return
 		}
@@ -122,35 +121,30 @@ func main() {
 			_, err := io.Copy(os.Stdout, result.ReqResponse.Body)
 			if err != nil {
 				log.Fatal(err.Error())
-				return
 			}
 		} else {
-
-			// checking if request failed if yes then log
-			if result.ReqResponse.StatusCode >= 400 { // anything over 400 means request wasnt successful
+			if result.ReqResponse.StatusCode >= 400 {
 				fmt.Println("request failed with status:")
 				LoggingConf.DisplayReqStatus()
+				return
 			}
 
 			// outputting
 			fmt.Println("request status:")
 			LoggingConf.DisplayReqStatus()
 
+			fmt.Println("request latency:")
 			LoggingConf.DisplayReqLatency()
 
 			fmt.Println("\nheaders:")
 			for k, v := range result.ReqResponse.Header {
-				fmt.Println(k+":", v) // key:value output style for headers
+				fmt.Println(k+":", v)
 			}
 
-			fmt.Println("\nbody:")
-
-			// var format bytes.Buffer // pretty printed body will be stored here before outputted
+			fmt.Println("\nrequest body:")
 
 			LoggingConf.DisplayReqBody()
-
 			LoggingConf.DisplayReqBodyLen()
-
 		}
 	}
 }
