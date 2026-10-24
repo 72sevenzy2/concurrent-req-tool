@@ -70,7 +70,7 @@ func StartSession(b *bufio.Scanner, store *Data) {
 				conf.reqMethod = parts[3]
 				remainingArgs := parts[4:]
 
-				switch conf.reqMethod {
+				switch strings.ToUpper(conf.reqMethod) {
 				case http.MethodGet, http.MethodHead, http.MethodDelete, http.MethodOptions, http.MethodTrace, http.MethodConnect:
 					if ok := HandleMethodsWithoutBody(remainingArgs, conf, store); !ok {
 						continue
@@ -80,6 +80,9 @@ func StartSession(b *bufio.Scanner, store *Data) {
 					if ok := HandleMethodsWithBody(remainingArgs, conf, store); !ok {
 						continue
 					}
+				default:
+					fmt.Println(InvalidMethodErr.Error())
+					continue
 				}
 
 				// initialising final req
