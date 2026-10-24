@@ -1,16 +1,11 @@
 <h1 align="center">pre-requisites: make sure you have go installed:</h2>
-
-
 <h2 align="center">
-    <code> go -v </code>
+    <code> go version </code>
 </h2>
-<h2 align="center">or:</h2>
+<h3 align="center">(requires go version 1.25 or higher.)</h3>
 
-<h2 align="center">
-    <code> go --v </code>
-</h2>
 <br>
-<h1 align="center">get started:</h2>
+<h1 align="center">getting started:</h2>
 
 <h2 align="center">setting headers while testing</h2>
 
@@ -20,33 +15,33 @@
 
 
 <br>
-<h2 align="center">testing post/get requests</h2>
+<h2 align="center">testing with different http methods</h2>
 <h3 align="center">
-    <code> go run . [-x POST/GET] [URL] </code>
+    <code> go run . [-x METHOD] [URL] </code>
 </h3>
-<h4 align="center">(only works with post and get for now.)</h4>
+
 <br>
 
-<h2 align="center">with streaming enabled: (streaming gives live response data response)</h2>
+<h2 align="center">with streaming enabled:</h2>
 
 <h3 align="center">
     <code> go run . [-H key:value] [-stream true/false] [URL] </code>
 </h3>
 
-<h3 align="center">(important to note that you can include 1 of many flags while testing aswell, but make sure to always include the URL at the end).</h3>
+<h3 align="center">(you can include 1 of many flags while testing aswell, but make sure to always include the URL at the end.)</h3>
 
 <br>
 
-<h2 align="center">response body logging</h2>
+<h2 align="center">to allow response body logging:</h2>
 
 <h3 align="center">
     <code> go run . [-b true/false -s 1024] [URL] </code>
 </h3>
 
-<h4 align="center">(you can set a limit on the response body size to log, as with the -s flag, if you want it to be the default (1024), simply do not include the flag and only include the -b flag).</h4>
+<h4 align="center">(you can set a limit on the response body size to log, as with the -s flag, if you want it to be the default (1 KiB), simply do not include the flag and only include the -b flag).</h4>
 <br>
-<h2 align="center">concurrent requests</h2>
-<h3 align="center">(send mulitple requests simultaneously):</h4>
+<h2 align="center">concurrent testing</h2>
+<h3 align="center">(sending numerous requests simultaneously):</h4>
 <h3 align="center">
     <code> go run . [-c (number)] [URL] </code>
 </h3>
@@ -57,7 +52,7 @@
 <h3 align="center">Instead of manually pasting, you can enter session mode to dynamically store urls, headers, etc in a variable and then use that variable to test API's (in which the variable will hold the header/url etc).</h3>
 
 <br>
-<h3 align="center">to enter session mode, run the following:</h3>
+<h3 align="center">to enter session mode:</h3>
 
 <h3 align="center">
     <code> go run . [-session true/false] </code>
@@ -100,7 +95,7 @@
     <code> TEST [VarName] [-h headerName:value] </code>
 </h3>
 
-<h4 align="center">you can also make POST/GET requests as so:</h4>
+<h4 align="center">you can also configure the method as so:</h4>
 <h3 align="center">
     <code> TEST [VarName] [-x GET] </code>
 </h3>
@@ -112,6 +107,7 @@
 <h3 align="center">
     <code> TEST [VarName] [-x POST  -F [title:value]] </code>
 </h3>
+<h3 align="center">(compatible with any http method.)</h3>
 <br>
 
 <h2 align="center">sending multiple requests:</h2>
@@ -133,7 +129,3 @@
     <code> EXIT </code>
 </h3>
 <br>
-<h4 align="center">and make sure you use the exact format as shown, (title:value).</h4>
-<h4 align="center">also important, you can include multiple flag options at once when testing (except -F and -D for -x POST).</h4>
-
-<h4 align="center">VarName should be a variable assigned with a valid url, however for session mode, you can store headers/body data/urls in variables to utilise them when using the TEST/SPAM cmd.</h4>
