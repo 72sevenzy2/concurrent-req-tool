@@ -120,17 +120,14 @@ func Log(conf *LoggerParamConf) *LoggerConf { // move time.Now() (start) and end
 			if requests[v].Reqerr != nil {
 				continue
 			}
-			bodybytes, bodyerr = io.ReadAll(requests[v].ReqResponse.Body)
+
+			bodyReader := io.LimitReader(requests[v].ReqResponse.Body, int64(*max))
+			bodybytes, bodyerr = io.ReadAll(bodyReader)
 			if bodyerr != nil {
 				fmt.Println(bodyerr.Error())
 			}
 
 			requests[v].ReqResponse.Body = io.NopCloser(bytes.NewBuffer(bodybytes))
-
-			fmt.Println("max:", *max, "len:", len(bodybytes))
-			if *max > 0 && len(bodybytes) > *max {
-				bodybytes = bodybytes[:*max]
-			}
 			fmt.Println("after truncating:", len(bodybytes))
 			bodyprev = string(bodybytes)
 
