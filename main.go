@@ -28,7 +28,6 @@ func main() {
 	session := flag.Bool("session", false, "enable session mode.")
 	// flag for concurrent requests
 	Reqs := flag.Int("c", 1, "number of requests.") // will be passed in Log()
-
 	data := flag.String("d", "", "request data")
 
 	flag.Parse() // parse flags
@@ -47,27 +46,22 @@ func main() {
 	}
 
 	url := flag.Args()[0]
-
 	uc := strings.ToUpper(*method) // normalise request method input as all caps for easier comparison
 	var v string                   // holding actual method after validating if method is appropriate
 
-	allowed := map[string]bool{
-		"GET":  true,
-		"POST": true,
-	}
-
-	if allowed[uc] {
+	switch uc {
+	case http.MethodGet, http.MethodPost, http.MethodTrace, http.MethodDelete, http.MethodPut, http.MethodHead, http.MethodOptions, http.MethodPatch:
 		v = uc
-	} else {
-		fmt.Println(InvalidMethodErr.Error())
-		return
+	default:
+		log.Fatal(InvalidMethodErr.Error())
 	}
 
 	// body reader for post data
 	var body io.Reader
 
 	if *data != "" {
-		if v == http.MethodGet {
+		switch v {
+		case http.MethodGet, http.MethodHead, http.MethodDelete, http.MethodTrace:
 			fmt.Println(bodyNotAllowederr.Error())
 			return
 		}
@@ -78,7 +72,6 @@ func main() {
 	req, err := http.NewRequest(v, url, body)
 	if err != nil {
 		log.Fatal(err.Error())
-		return
 	}
 
 	// add heders
@@ -112,7 +105,7 @@ func main() {
 			LoggingConf.Err()
 			return
 		}
-		if result.ReqResponse != nil {
+		if result.ReqResponse == nil {
 			continue
 		}
 		defer result.ReqResponse.Body.Close()
