@@ -68,25 +68,16 @@ func StartSession(b *bufio.Scanner, store *Data) {
 			if uc == "-X" {
 
 				conf.reqMethod = parts[3]
-
-				if strings.ToUpper(conf.reqMethod) != "GET" && strings.ToUpper(conf.reqMethod) != "POST" {
-					fmt.Println("feature is only compatible with GET/POST requests currently.")
-					continue
-				}
-
-				// parsing remaining parts after parts[3]
 				remainingArgs := parts[4:]
 
-				// get req
-				if strings.ToUpper(conf.reqMethod) == "GET" {
-					if ok := HandleSpamGet(remainingArgs, conf, store); !ok {
+				switch conf.reqMethod {
+				case http.MethodGet, http.MethodHead, http.MethodDelete, http.MethodOptions, http.MethodTrace, http.MethodConnect:
+					if ok := HandleMethodsWithoutBody(remainingArgs, conf, store); !ok {
 						continue
 					}
-				}
-				// post req
-				if strings.ToUpper(conf.reqMethod) == "POST" {
-					ok := HandleSpamPost(remainingArgs, conf, store)
-					if !ok {
+
+				case http.MethodPost, http.MethodPut, http.MethodPatch:
+					if ok := HandleMethodsWithBody(remainingArgs, conf, store); !ok {
 						continue
 					}
 				}

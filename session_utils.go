@@ -336,7 +336,7 @@ func ExtractSpamUrl(parts []string, store *Data, conf *SpamConf) bool {
 	return true
 }
 
-func HandleSpamGet(remainingArgs []string, conf *SpamConf, store *Data) bool {
+func HandleMethodsWithoutBody(remainingArgs []string, conf *SpamConf, store *Data) bool {
 
 	if len(remainingArgs) < 2 {
 		fmt.Println("not enough arguments, please consider: -C")
@@ -379,22 +379,7 @@ func HandleSpamGet(remainingArgs []string, conf *SpamConf, store *Data) bool {
 	return true
 }
 
-func BuildRequest(method string, target string, body io.Reader, headers http.Header) (*http.Request, error) {
-	req, err := http.NewRequest(method, target, body)
-	if err != nil {
-		return nil, fmt.Errorf("create request: %w", err)
-	}
-
-	for key, values := range headers {
-		for _, value := range values {
-			req.Header.Add(key, value)
-		}
-	}
-
-	return req, nil
-}
-
-func HandleSpamPost(remainingArgs []string, conf *SpamConf, store *Data) bool {
+func HandleMethodsWithBody(remainingArgs []string, conf *SpamConf, store *Data) bool {
 	if len(remainingArgs) < 4 {
 		fmt.Println("not enough arguments, please consider: -c ['int'] and -d ['json'].")
 		return false
