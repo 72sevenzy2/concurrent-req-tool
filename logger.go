@@ -117,6 +117,9 @@ func Log(conf *LoggerParamConf) *LoggerConf { // move time.Now() (start) and end
 
 		if *conf.AllowReqBody {
 			max = conf.ReqBodySize
+			if *max == 0 {
+				max = IntPtr(1024) // default to 1 KiB logging limit.
+			}
 			if requests[v].Reqerr != nil {
 				continue
 			}
