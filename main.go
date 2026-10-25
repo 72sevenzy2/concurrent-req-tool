@@ -38,7 +38,7 @@ func main() {
 		scanner := bufio.NewScanner(os.Stdin)
 		store := NewStore()
 
-		StartSession(scanner, store)
+		StartSession(scanner, store, timeout)
 	}
 
 	if err := Validate(flag.Args()); err != nil {

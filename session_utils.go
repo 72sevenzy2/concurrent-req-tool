@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 )
 
 // fetch cmd
@@ -310,8 +311,13 @@ type SpamConf struct {
 	reqCap    int
 }
 
-func InitSpamConfig() *SpamConf {
+func InitSpamConfig(timeout time.Duration) *SpamConf {
+	client := http.Client{
+		Timeout: timeout,
+	}
+
 	return &SpamConf{
+		client:    client,
 		reqBody:   nil,
 		reqUrl:    "",
 		reqMethod: "",

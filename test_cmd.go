@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-func RunTestCommand(parts []string, store *Data) {
+func RunTestCommand(parts []string, store *Data, timeout *int) {
 	target, ok := HandleTestValdiation(parts, store)
 	if !ok {
 		return
@@ -140,7 +140,7 @@ func RunTestCommand(parts []string, store *Data) {
 	reqConf.cl.Header = headers.Clone()
 
 	client := &http.Client{
-		Timeout: 15 * time.Second,
+		Timeout: time.Duration(*timeout),
 	}
 
 	resp, err := client.Do(reqConf.cl)

@@ -5,10 +5,11 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+	"time"
 )
 
 // start a interactive session
-func StartSession(b *bufio.Scanner, store *Data) {
+func StartSession(b *bufio.Scanner, store *Data, timeout *int) {
 	fmt.Println("session started.")
 	for {
 		fmt.Print(">")
@@ -47,9 +48,9 @@ func StartSession(b *bufio.Scanner, store *Data) {
 
 			// actual api testing logic (GET only for now)
 		case "TEST":
-			RunTestCommand(parts, store)
+			RunTestCommand(parts, store, timeout)
 		case "SPAM":
-			conf := InitSpamConfig()
+			conf := InitSpamConfig(time.Duration(*timeout))
 
 			ok := ExtractSpamUrl(parts, store, conf) // conf.reqUrl would hold url
 			if !ok {
