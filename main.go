@@ -17,7 +17,11 @@ import (
 type HeaderFlags []string
 
 func main() {
-	var headers HeaderFlags
+	var (
+		headers          HeaderFlags // holds the request headers added as input.
+		body             io.Reader   // holds the body of the request.
+		validatedRequest string      // holds the designated request method after validation.
+	)
 
 	// cli inputs
 	flag.Var(&headers, "H", "Header (key:value)")
@@ -48,20 +52,14 @@ func main() {
 
 	url := flag.Args()[0]
 	uc := strings.ToUpper(*method) // normalise request method input as all caps for easier comparison
-	var v string                   // holding actual method after validating if method is appropriate
-
 	switch uc {
 	case http.MethodGet, http.MethodPost, http.MethodTrace, http.MethodDelete, http.MethodPut, http.MethodHead, http.MethodOptions, http.MethodPatch:
-		v = uc
+		validatedRequest = uc
 	default:
 		log.Fatal(InvalidMethodErr.Error())
 	}
-
-	// body reader for post data
-	var body io.Reader
-
 	if *data != "" {
-		switch v {
+		switch validatedRequest {
 		case http.MethodGet, http.MethodHead, http.MethodDelete, http.MethodTrace:
 			fmt.Println(bodyNotAllowederr.Error())
 			return
@@ -70,7 +68,7 @@ func main() {
 		body = strings.NewReader(*data)
 	}
 
-	req, err := http.NewRequest(v, url, body)
+	req, err := http.NewRequest(validatedRequest, url, body)
 	if err != nil {
 		log.Fatal(err.Error())
 	}
@@ -95,13 +93,7 @@ func main() {
 	}
 
 	LoggingConf := Log(LogParamConf)
-
-	// todo: make one big nested loop for loggingConf.Results instead of redoing.
 	for _, result := range LoggingConf.Results {
-		if result.Reqbody == "" {
-			fmt.Println("body is empty")
-		}
-
 		if result.Reqerr != nil {
 			LoggingConf.Err()
 			return
