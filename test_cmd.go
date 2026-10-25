@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"net/url"
 	"strings"
@@ -126,9 +127,15 @@ func RunTestCommand(parts []string, store *Data, timeout *int) {
 		utilConf.reqType = method
 	}
 
-	// todo: validate http method before constructing.
+	var m string
+	switch method {
+	case http.MethodGet, http.MethodPost, http.MethodTrace, http.MethodDelete, http.MethodPut, http.MethodHead, http.MethodOptions, http.MethodPatch:
+		m = method
+	default:
+		log.Fatal(InvalidMethodErr.Error())
+	}
 	reqConf.cl, reqConf.clErr = http.NewRequest(
-		method,
+		m,
 		target,
 		body,
 	)
