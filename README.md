@@ -3,43 +3,35 @@
     <code> go version </code>
 </h2>
 <h3 align="center">(requires go version 1.25 or higher.)</h3>
-
 <br>
 <h1 align="center">getting started:</h2>
-
 <h2 align="center">setting headers while testing</h2>
-
 <h3 align="center"> 
     <code> go run . [-H key:value] [URL] </code>
 </h>
-
-
 <br>
 <h2 align="center">testing with different http methods</h2>
 <h3 align="center">
     <code> go run . [-x METHOD] [URL] </code>
 </h3>
-
 <br>
-
 <h2 align="center">with streaming enabled:</h2>
-
 <h3 align="center">
     <code> go run . [-H key:value] [-stream true/false] [URL] </code>
 </h3>
-
 <h3 align="center">(you can include 1 of many flags while testing aswell, but make sure to always include the URL at the end.)</h3>
-
 <br>
-
 <h2 align="center">to allow response body logging:</h2>
-
 <h3 align="center">
     <code> go run . [-b true/false -s 1024] [URL] </code>
 </h3>
-
 <h4 align="center">(you can set a limit on the response body size to log, as with the -s flag, if you want it to be the default (1 KiB), simply do not include the flag and only include the -b flag).</h4>
 <br>
+<h2 align="center">you can also set timeouts for requests:</h2>
+<h3 align="center">
+    <code> go run . [-timeout duration] [URL] </code>
+</h3>
+<h4 align="center">this can safeguard against hung network calls, the default timeout is set as 10 seconds. The timeout will be set as a global default even in session mode.</h4>
 <h2 align="center">concurrent testing</h2>
 <h3 align="center">(sending numerous requests simultaneously):</h4>
 <h3 align="center">
@@ -47,17 +39,13 @@
 </h3>
 <h4 align="center">be sure to include a reasonable number of requests to be sent.</h4>
 <br>
-<h2 align="center">session mode:</h2>
-
+<h1 align="center">session mode:</h1>
 <h3 align="center">Instead of manually pasting, you can enter session mode to dynamically store urls, headers, etc in a variable and then use that variable to test API's (in which the variable will hold the header/url etc).</h3>
-
 <br>
 <h3 align="center">to enter session mode:</h3>
-
 <h3 align="center">
-    <code> go run . [-session true/false] </code>
+    <code> go run . [-session true/false] [-timeout duration]</code>
 </h3>
-
 <h3 align="center">when entering session mode, the url does not need to be present at the end.</h3>
 <br>
 <h2 align="center">session mode tutorial:</h2>
@@ -84,17 +72,14 @@
 </h3>
 <br>
 <h3 align="center">using the variables you stored for API testing:</h3>
-
 <h4 align="center">(for standard get requests):</h4>
 <h3 align="center">
     <code> TEST [VarName] </code>
 </h3>
-
 <h4 align="center">if you a custom header aswell, do so in the following format:</h4>
 <h3 align="center">
     <code> TEST [VarName] [-h headerName:value] </code>
 </h3>
-
 <h4 align="center">you can also configure the method as so:</h4>
 <h3 align="center">
     <code> TEST [VarName] [-x GET] </code>
@@ -109,15 +94,12 @@
 </h3>
 <h3 align="center">(compatible with any http method.)</h3>
 <br>
-
 <h2 align="center">sending multiple requests:</h2>
-
 <h3 align="center">for post request:</h3>
 <h3 align="center">
     <code> SPAM [VarName] [-x POST] [-c 10] [-d {"name": "alex"}] </code>
 </h3>
 <h4 align="center">be sure to include the "-c" flag as it is the number of requests that are to be sent to the api, with the json data that should be provided in the "-d" flag. </h4>
-
 <h3 align="center">and for get requests:</h3>
 <h3 align="center">
     <code> SPAM [VarName] [-x GET] [-c 10] </code>
