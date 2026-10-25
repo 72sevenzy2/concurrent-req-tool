@@ -21,40 +21,6 @@ type LoggerConf struct {
 	Results []*RequestResult
 }
 
-// small utils for LoggerConf
-
-func (b LoggerConf) DisplayReqStatus() {
-	for v := range len(b.Results) {
-		fmt.Println(b.Results[v].ReqResponse.Status)
-	}
-}
-
-func (b LoggerConf) DisplayReqLatency() {
-	for v := range len(b.Results) {
-		fmt.Println("request latency:", b.Results[v].Reqtime)
-	}
-}
-
-func (b LoggerConf) DisplayReqBodyLen() {
-	for v := range len(b.Results) {
-		fmt.Println("request body length:", b.Results[v].Reqlen)
-	}
-}
-
-func (b LoggerConf) DisplayReqBody() {
-	for v := range len(b.Results) {
-		fmt.Println(b.Results[v].Reqbody)
-	}
-}
-
-func (b LoggerConf) Err() {
-	for _, v := range b.Results {
-		if v.Reqerr != nil {
-			fmt.Println(v.Reqerr)
-		}
-	}
-}
-
 // for params
 type LoggerParamConf struct {
 	Reqclient    *http.Client
@@ -102,6 +68,7 @@ func Log(conf *LoggerParamConf) *LoggerConf { // move time.Now() (start) and end
 		fmt.Println("with query:", conf.Req.URL.RawQuery)
 	}
 
+	// todo: redact other headers -> proxy authorization, cookie, set-cookie, x-api-key, x-auth-token, x-access-token, x-refresh-token, x-csrf-token, x-amz-security-token, x-goog-api-key, authentication info, proxy authenticate.
 	// exlude sensitive headers
 	fmt.Println("request header details:")
 	newHeaders := conf.Req.Header.Clone()
@@ -143,5 +110,39 @@ func Log(conf *LoggerParamConf) *LoggerConf { // move time.Now() (start) and end
 	}
 	return &LoggerConf{
 		Results: requests,
+	}
+}
+
+// small utils for LoggerConf
+
+func (b LoggerConf) DisplayReqStatus() {
+	for v := range len(b.Results) {
+		fmt.Println(b.Results[v].ReqResponse.Status)
+	}
+}
+
+func (b LoggerConf) DisplayReqLatency() {
+	for v := range len(b.Results) {
+		fmt.Println("request latency:", b.Results[v].Reqtime)
+	}
+}
+
+func (b LoggerConf) DisplayReqBodyLen() {
+	for v := range len(b.Results) {
+		fmt.Println("request body length:", b.Results[v].Reqlen)
+	}
+}
+
+func (b LoggerConf) DisplayReqBody() {
+	for v := range len(b.Results) {
+		fmt.Println(b.Results[v].Reqbody)
+	}
+}
+
+func (b LoggerConf) Err() {
+	for _, v := range b.Results {
+		if v.Reqerr != nil {
+			fmt.Println(v.Reqerr)
+		}
 	}
 }
