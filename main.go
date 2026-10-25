@@ -29,6 +29,7 @@ func main() {
 	// flag for concurrent requests
 	Reqs := flag.Int("c", 1, "number of requests.") // will be passed in Log()
 	data := flag.String("d", "", "request data")
+	timeout := flag.Int("timeout", 10, "request timeout.")
 
 	flag.Parse() // parse flags
 
@@ -81,7 +82,7 @@ func main() {
 	}
 
 	client := &http.Client{
-		Timeout: 10 * time.Second, // safeguards against hung network calls.
+		Timeout: time.Duration(*timeout), // safeguards against hung network calls.
 	}
 
 	// logger parameters config
