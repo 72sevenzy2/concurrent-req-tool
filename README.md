@@ -5,7 +5,7 @@
 <h1 align="center">instillation:</h1>
 
 ```
-go get github.com/72sevenzy2/http-tester
+git clone https://github.com/72sevenzy2/http-tester.git
 ```
 
 <h1 align="center">getting started:</h2>
