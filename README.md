@@ -1,9 +1,13 @@
-<h1 align="center">pre-requisites: make sure you have go installed:</h2>
-<h2 align="center">
-    <code> go version </code>
-</h2>
-<h3 align="center">(requires go version 1.25 or higher.)</h3>
+<h1 align="center">concurrent req tool</h1>
+
+<h2 align="center">pre-requisite: requires go version 1.25+</h2>
 <br>
+<h1 align="center">instillation:</h1>
+
+```
+go get github.com/72sevenzy2/http-tester
+```
+
 <h1 align="center">getting started:</h2>
 <h2 align="center">setting headers while testing</h2>
 <h3 align="center"> 
